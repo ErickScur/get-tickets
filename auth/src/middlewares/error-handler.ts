@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
-import { RequestValidationError } from '../errors'
+import { DatabaseConnectionError, RequestValidationError } from '../errors'
 
 export const errorHandler = (
   err: Error,
@@ -11,6 +11,14 @@ export const errorHandler = (
     const formattedErros = err.errors.map((error) => {
       return { message: error.msg, field: error.param }
     })
-    res.status(400).send({ errors: formattedErros })
+    return res.status(400).send({ errors: formattedErros })
   }
+
+  if (err instanceof DatabaseConnectionError) {
+    return res.status(500).send({ errors: [{ message: err.reason }] })
+  }
+
+  return res.status(500).send({
+    errors: [{ message: 'Something went wrong' }],
+  })
 }

@@ -3,6 +3,7 @@ import { body, validationResult } from 'express-validator'
 import { ConflictError } from '../errors/conflict-error'
 import { RequestValidationError } from '../errors/request-validation-error'
 import { User } from '../models/user'
+import jwt from 'jsonwebtoken'
 
 const router = Router()
 
@@ -33,6 +34,12 @@ router.post(
       password,
     })
     await user.save()
+
+    const token = jwt.sign({ id: user._id, email: user.email }, 'asdf')
+
+    req.session = {
+      jwt: token,
+    }
 
     res.status(201).send(user)
   },

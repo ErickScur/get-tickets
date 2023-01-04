@@ -3,6 +3,8 @@ import { body } from 'express-validator'
 import { UnauthorizedError } from '../errors'
 import { validateRequest } from '../middlewares/validate-request'
 import { User } from '../models/user'
+import { HashProvider } from '../providers/hash-provider'
+import jwt from 'jsonwebtoken'
 
 const router = Router()
 
@@ -23,6 +25,22 @@ router.post(
     if (!user) {
       throw new UnauthorizedError('Invalid credentials')
     }
+
+    const isPasswordValid = HashProvider.compare(user.password, password)
+    if (!isPasswordValid) {
+      throw new UnauthorizedError('Invalid credentials')
+    }
+
+    const token = jwt.sign(
+      { id: user.id, email: user.email },
+      process.env.JWT_KEY!,
+    )
+
+    req.session = {
+      jwt: token,
+    }
+
+    res.status(200).send(user)
   },
 )
 

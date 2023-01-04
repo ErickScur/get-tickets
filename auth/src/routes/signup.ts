@@ -32,7 +32,7 @@ router.post(
     await user.save()
 
     const token = jwt.sign(
-      { id: user._id, email: user.email },
+      { id: user.id, email: user.email },
       process.env.JWT_KEY!,
     )
 

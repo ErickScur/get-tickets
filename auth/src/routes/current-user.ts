@@ -1,10 +1,9 @@
 import { Router } from 'express'
-import jwt from 'jsonwebtoken'
-import { currentUser } from '../middlewares/current-user'
+import { currentUser, requireAuth } from '../middlewares'
 
 const router = Router()
 
-router.get('/api/users/currentuser', currentUser, (req, res) => {
+router.get('/api/users/currentuser', currentUser, requireAuth, (req, res) => {
   return res.send({ currentUser: req.currentUser })
 })
 
